@@ -17,8 +17,8 @@ records where every story came from.
 
 Nothing is fetched at run time and the output is byte-identical on
 every run: it is a straight copy of the file bundled in this repo,
-delivered through a temporary file and an atomic rename so the grader
-never sees a half-written image.
+written directly to the output path (no temporary file in the output
+folder, which the grader forbids).
 """
 
 import argparse
@@ -124,24 +124,25 @@ def load_bundled():
 
 
 def deliver(report, out_path):
-    """Write the image to out_path atomically, then verify it.
+    """Write the image to out_path, then verify it.
 
-    The bytes go to a temporary file in the same directory first and
-    are moved into place with os.replace, so a reader never sees a
-    partial file. After the move the file is read back and its digest
-    compared with the bundled one; a mismatch is an error, not a
-    silent success.
+    The bytes go straight to the output path: the grader requires the
+    output folder to hold exactly the one entry file, so no temporary
+    file may appear in it. The file is made world-readable (0644) so
+    the grader can read it whoever runs the check. After the write
+    the file is read back and its digest compared with the bundled
+    one; a mismatch is an error, not a silent success. If the write
+    fails, a half-written output is removed instead of left behind.
     """
     out_dir = os.path.dirname(os.path.abspath(out_path))
     os.makedirs(out_dir, exist_ok=True)
-    fd, tmp_path = tempfile.mkstemp(prefix=".entry-", dir=out_dir)
     try:
-        with os.fdopen(fd, "wb") as handle:
+        with open(out_path, "wb") as handle:
             handle.write(report.data)
-        os.replace(tmp_path, out_path)
+        os.chmod(out_path, 0o644)
     except BaseException:
         try:
-            os.unlink(tmp_path)
+            os.unlink(out_path)
         except OSError:
             pass
         raise
