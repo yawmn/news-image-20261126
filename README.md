@@ -23,21 +23,28 @@ was first reported on 26 November 2026. A full source ledger
 (`traceability-ledger.json`) records the source and the image location
 of every story.
 
+v4 (26 Nov 2026) is a from-scratch rebuild of the v3 broadsheet: all
+13 scenes and the map redrawn, richer lead scenes, a more detailed
+map, and headline-only briefs with sources collected in one line
+underneath. Same 36 stories, same facts, same sources and dates.
+
 Entry for the [news-image-20261126 bounty](https://make.fun/bounty/news-image-20261126)
 on [make.fun](https://make.fun) — play at https://make.fun/r/wkpcknk0.
 
 ## How it works
 
 `main.py` (Python 3, standard library only) inspects the bundled
-`entry.png` (whole PNG, IEND intact, under 1 MiB, at most 1024×1024
-pixels) and delivers it to `/output/entry.png` through a temporary
-file and an atomic rename, then reads the written file back and
-compares its SHA-256 digest with the bundled one. `--check` inspects
-without writing; `--self-test` delivers to a temporary directory.
+`entry.png` (whole PNG, every chunk CRC verified, IEND intact, under
+1 MiB, at most 1024×1024 pixels) and delivers it to
+`/output/entry.png` through a temporary file and an atomic rename,
+then reads the written file back and compares its SHA-256 digest
+with the bundled one. `--check` inspects without writing;
+`--self-test` delivers to a temporary directory.
 
 ## Files
 
-- `entry.png` — the entry image (1024×989, 707,558 bytes)
+- `entry.png` — the entry image (1024×1024, 728,044 bytes, sha256
+  47c16b6964b183db4c289a70ccc3d5111eb80d62fd61cc5fd36e7f6b19654b29)
 - `main.py` — the entry program
 - `traceability-ledger.json` — source ledger for all 36 stories
 - `LICENSE` — MIT
